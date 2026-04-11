@@ -411,6 +411,27 @@
               }
           });
 
+          // Otimização CRO: Tracking Forçado de InitiateCheckout (Garantia de Pixel)
+          const allCheckoutBtns = document.querySelectorAll('button, a');
+          allCheckoutBtns.forEach(btn => {
+              const bText = btn.textContent.toUpperCase();
+              if (bText.includes('DINÂMICAS AGORA') || bText.includes('PREMIUM') || bText.includes('BÁSICO') || bText.includes('BASICO')) {
+                  if (!btn.dataset.croPixelTracked) {
+                      btn.addEventListener('click', () => {
+                          console.log("[CRO] Botão de Oferta Clicado: disparando regras de IC (InitiateCheckout)");
+                          // Dispara o Checkout diretamente no motor nativo que a UTMify instala
+                          if (typeof fbq === 'function') {
+                              fbq('track', 'InitiateCheckout', { content_name: bText.trim() });
+                          }
+                          if (typeof ttq !== 'undefined' && typeof ttq.track === 'function') {
+                              ttq.track('InitiateCheckout', { content_name: bText.trim() });
+                          }
+                      });
+                      btn.dataset.croPixelTracked = 'true';
+                  }
+              }
+          });
+
           // Otimização CRO: Injetar Vídeo VSL Wistia DIRETAMENTE abaixo da Subheadline
           const allPElements = document.querySelectorAll('p');
           allPElements.forEach(p => {
