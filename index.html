@@ -532,12 +532,16 @@
           // Otimização CRO: Tracking Forçado de InitiateCheckout (Garantia de Pixel)
           const allCheckoutBtns = document.querySelectorAll("button, a");
           allCheckoutBtns.forEach((btn) => {
-            const bText = btn.textContent.toUpperCase();
-            if (
-              bText.includes("PREMIUM") ||
-              bText.includes("BÁSICO") ||
-              bText.includes("BASICO")
-            ) {
+            let bText = btn.textContent.trim().toLowerCase();
+            bText = bText.replace(/[\n\r\t]+/g, ' ').replace(/\s+/g, ' '); // normaliza os espaços
+            
+            // Só dispara IC nos botões especificados pelo cliente
+            const isMatch = bText.includes("quero o premium por 14,90") || 
+                            bText.includes("não, quero apenas o plano basico") || 
+                            bText.includes("nao, quero apenas o plano basico") || 
+                            bText.includes("escolher plano premium");
+                            
+            if (isMatch) {
               if (!btn.dataset.croPixelTracked) {
                 btn.addEventListener("click", () => {
                   console.log(
